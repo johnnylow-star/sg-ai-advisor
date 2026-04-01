@@ -318,8 +318,8 @@ export default function Form() {
                     return (
                       <div style={{
                         background: '#e8f4ff', border: '1.5px solid #90caf9',
-                        borderRadius: '0 0 10px 10px', padding: '14px 16px',
-                        marginTop: -2
+                        borderRadius: 10, padding: '14px 16px',
+                        marginTop: 6
                       }}>
                         <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1565c0', marginBottom: 10 }}>
                           ↳ {q.label}

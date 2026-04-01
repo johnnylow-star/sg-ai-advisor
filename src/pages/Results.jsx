@@ -141,6 +141,25 @@ export default function Results() {
             </div>
           </div>
 
+          {/* Export PDF — below confidence bar */}
+          <div style={{ marginTop: 20 }}>
+            <button
+              onClick={handleExportPDF}
+              disabled={exporting}
+              style={{
+                padding: '10px 24px', borderRadius: 50,
+                background: exporting ? 'rgba(255,255,255,0.2)' : 'white',
+                color: exporting ? 'rgba(255,255,255,0.5)' : '#1e90ff',
+                border: '2px solid rgba(255,255,255,0.3)',
+                cursor: exporting ? 'not-allowed' : 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 700, fontSize: '0.88rem',
+                display: 'inline-flex', alignItems: 'center', gap: 8
+              }}>
+              {exporting ? '⏳ Generating PDF...' : '⬇️ Export PDF Report'}
+            </button>
+          </div>
+
           {/* Executive Summary */}
           {roadmap?.executiveSummary && (
             <div style={{ marginTop: 24, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '20px 24px' }}>
@@ -174,39 +193,21 @@ export default function Results() {
         </div>
       )}
 
-      {/* FIX 1 — Tabs + Export PDF button aligned to top right */}
+      {/* Tabs only — no export button here */}
       <div style={{ background: 'white', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', overflowX: 'auto' }}>
-            {tabs.map(tab => (
-              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                style={{
-                  padding: '16px 20px', border: 'none', background: 'none', cursor: 'pointer',
-                  fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.85rem',
-                  color: activeTab === tab.id ? '#1e90ff' : 'var(--text-light)',
-                  borderBottom: activeTab === tab.id ? '3px solid #1e90ff' : '3px solid transparent',
-                  whiteSpace: 'nowrap', transition: 'all 0.2s ease'
-                }}>
-                {tab.label}
-              </button>
-            ))}
-          </div>
-          {/* Export PDF button - top right */}
-          <button
-            onClick={handleExportPDF}
-            disabled={exporting}
-            style={{
-              flexShrink: 0, marginRight: 16, marginLeft: 8,
-              padding: '9px 20px', borderRadius: 50,
-              background: exporting ? '#ccc' : '#1e90ff',
-              color: 'white', border: 'none',
-              cursor: exporting ? 'not-allowed' : 'pointer',
-              fontFamily: 'Plus Jakarta Sans, sans-serif',
-              fontWeight: 700, fontSize: '0.82rem',
-              whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6
-            }}>
-            {exporting ? '⏳ Generating...' : '⬇️ Export PDF'}
-          </button>
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', overflowX: 'auto' }}>
+          {tabs.map(tab => (
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              style={{
+                padding: '16px 20px', border: 'none', background: 'none', cursor: 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.85rem',
+                color: activeTab === tab.id ? '#1e90ff' : 'var(--text-light)',
+                borderBottom: activeTab === tab.id ? '3px solid #1e90ff' : '3px solid transparent',
+                whiteSpace: 'nowrap', transition: 'all 0.2s ease'
+              }}>
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
