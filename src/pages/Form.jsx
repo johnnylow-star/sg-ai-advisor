@@ -62,21 +62,10 @@ export default function Form() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [form, setForm] = useState({
-    // Step 1 - Contact
     name: '', email: '', jobTitle: '',
-
-    // Step 2 - Company
     companyName: '', industry: '', employeeCount: '', revenue: '',
-    websiteUrl: '',
-
-    // Step 3 - AI Readiness
-    currentAiTools: '',
-    aiAwarenessLevel: '2',
-    dataAvailability: '',
-    techInfrastructure: '',
-    aiInterests: [],
-
-    // Step 4 - Pain Points
+    websiteUrl: '', currentAiTools: '', aiAwarenessLevel: '2',
+    dataAvailability: '', techInfrastructure: '', aiInterests: [],
     painPoints: [], otherPainPoints: '',
     marketingChannels: [], cxBreakdown: [], cyberConcerns: [],
     pdpaConcerns: [], dataState: []
@@ -93,9 +82,7 @@ export default function Form() {
     }))
   }
 
-  const handleSubmit = () => {
-    navigate('/results', { state: { formData: form } })
-  }
+  const handleSubmit = () => navigate('/results', { state: { formData: form } })
 
   const inputStyle = {
     width: '100%', padding: '12px 16px', borderRadius: 10,
@@ -112,26 +99,26 @@ export default function Form() {
   const chipStyle = (selected) => ({
     padding: '8px 16px', borderRadius: 50, cursor: 'pointer',
     fontSize: '0.85rem', fontWeight: 500, transition: 'all 0.15s ease',
-    border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
-    background: selected ? '#fff0e6' : 'white',
-    color: selected ? 'var(--accent)' : 'var(--text-dark)',
+    border: `2px solid ${selected ? '#1e90ff' : 'var(--border)'}`,
+    background: selected ? '#e8f4ff' : 'white',
+    color: selected ? '#1e90ff' : 'var(--text-dark)',
   })
 
   const totalSteps = 4
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '40px 24px' }}>
-      <div style={{ maxWidth: 720, margin: '0 auto' }}>
+    <div style={{ minHeight: '100vh', background: '#f0f4f8', padding: '0' }}>
+
+      {/* Top Nav */}
+      <div style={{ background: '#0a0f1e', padding: '16px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <img src="/SAIA_white.jpeg" alt="Singapore AI Association" style={{ height: 36, objectFit: 'contain' }} />
+        <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem' }}>Powered by Pantherpulse</span>
+      </div>
+
+      <div style={{ maxWidth: 720, margin: '0 auto', padding: '40px 24px' }}>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 32, height: 32, background: '#e8630a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: '0.85rem' }}>AI</div>
-            <div style={{ textAlign: 'left' }}>
-              <div style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '0.95rem' }}>Singapore AI Association</div>
-              <div style={{ fontSize: '0.72rem', color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Readiness Toolkit</div>
-            </div>
-          </div>
+        <div style={{ textAlign: 'center', marginBottom: 36 }}>
           <h1 style={{ fontSize: '1.9rem', color: 'var(--text-dark)', marginBottom: 8 }}>AI Readiness Assessment</h1>
           <p style={{ color: 'var(--text-light)', fontSize: '0.92rem' }}>
             Step {step} of {totalSteps} — {
@@ -144,13 +131,13 @@ export default function Form() {
         </div>
 
         {/* Progress Bar */}
-        <div style={{ height: 6, background: 'var(--border)', borderRadius: 10, marginBottom: 36 }}>
-          <div style={{ height: '100%', width: `${(step / totalSteps) * 100}%`, background: 'var(--accent)', borderRadius: 10, transition: 'width 0.4s ease' }} />
+        <div style={{ height: 6, background: 'var(--border)', borderRadius: 10, marginBottom: 32 }}>
+          <div style={{ height: '100%', width: `${(step / totalSteps) * 100}%`, background: '#1e90ff', borderRadius: 10, transition: 'width 0.4s ease' }} />
         </div>
 
         <div className="card">
 
-          {/* STEP 1 — Contact Details */}
+          {/* STEP 1 — Contact */}
           {step === 1 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <h2 style={{ fontSize: '1.3rem', marginBottom: 4 }}>Your Contact Details</h2>
@@ -164,9 +151,9 @@ export default function Form() {
               </div>
               <div>
                 <label style={labelStyle}>Job Title *</label>
-                <input style={inputStyle} placeholder="e.g. CEO, Operations Manager, IT Manager" value={form.jobTitle} onChange={e => update('jobTitle', e.target.value)} />
+                <input style={inputStyle} placeholder="e.g. CEO, Operations Manager" value={form.jobTitle} onChange={e => update('jobTitle', e.target.value)} />
               </div>
-              <button className="btn-primary" style={{ marginTop: 8, alignSelf: 'flex-end' }}
+              <button className="btn-primary" style={{ marginTop: 8, alignSelf: 'flex-end', background: '#1e90ff' }}
                 disabled={!form.name || !form.email || !form.jobTitle}
                 onClick={() => setStep(2)}>
                 Next →
@@ -174,7 +161,7 @@ export default function Form() {
             </div>
           )}
 
-          {/* STEP 2 — Company Profile */}
+          {/* STEP 2 — Company */}
           {step === 2 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <h2 style={{ fontSize: '1.3rem', marginBottom: 4 }}>Company Profile</h2>
@@ -186,7 +173,7 @@ export default function Form() {
                 <label style={labelStyle}>Company Website (optional but recommended)</label>
                 <input style={inputStyle} placeholder="e.g. https://www.yourcompany.com.sg" value={form.websiteUrl} onChange={e => update('websiteUrl', e.target.value)} />
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-light)', marginTop: 4 }}>
-                  💡 We'll analyse your website to tailor the AI recommendations more accurately
+                  💡 We'll analyse your website to tailor AI recommendations more accurately
                 </p>
               </div>
               <div>
@@ -201,27 +188,22 @@ export default function Form() {
                   <label style={labelStyle}>No. of Employees *</label>
                   <select style={inputStyle} value={form.employeeCount} onChange={e => update('employeeCount', e.target.value)}>
                     <option value="">Select</option>
-                    <option>1–10</option>
-                    <option>11–50</option>
-                    <option>51–200</option>
-                    <option>201–500</option>
-                    <option>500+</option>
+                    <option>1–10</option><option>11–50</option>
+                    <option>51–200</option><option>201–500</option><option>500+</option>
                   </select>
                 </div>
                 <div>
                   <label style={labelStyle}>Annual Revenue</label>
                   <select style={inputStyle} value={form.revenue} onChange={e => update('revenue', e.target.value)}>
                     <option value="">Select</option>
-                    <option>Under S$1M</option>
-                    <option>S$1M–S$10M</option>
-                    <option>S$10M–S$50M</option>
-                    <option>Above S$50M</option>
+                    <option>Under S$1M</option><option>S$1M–S$10M</option>
+                    <option>S$10M–S$50M</option><option>Above S$50M</option>
                   </select>
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                 <button className="btn-secondary" onClick={() => setStep(1)}>← Back</button>
-                <button className="btn-primary"
+                <button className="btn-primary" style={{ background: '#1e90ff' }}
                   disabled={!form.companyName || !form.industry || !form.employeeCount}
                   onClick={() => setStep(3)}>Next →</button>
               </div>
@@ -232,15 +214,11 @@ export default function Form() {
           {step === 3 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               <h2 style={{ fontSize: '1.3rem', marginBottom: 4 }}>AI Readiness Profile</h2>
-
               <div>
                 <label style={labelStyle}>Current AI or Automation Tools Used</label>
-                <input style={inputStyle}
-                  placeholder="e.g. ChatGPT, Zapier, Excel macros, none"
-                  value={form.currentAiTools}
-                  onChange={e => update('currentAiTools', e.target.value)} />
+                <input style={inputStyle} placeholder="e.g. ChatGPT, Zapier, Excel macros, none"
+                  value={form.currentAiTools} onChange={e => update('currentAiTools', e.target.value)} />
               </div>
-
               <div>
                 <label style={labelStyle}>Current Tech Infrastructure</label>
                 <select style={inputStyle} value={form.techInfrastructure} onChange={e => update('techInfrastructure', e.target.value)}>
@@ -252,7 +230,6 @@ export default function Form() {
                   <option>Advanced digital infrastructure with APIs and integrations</option>
                 </select>
               </div>
-
               <div>
                 <label style={labelStyle}>Data Availability & Quality</label>
                 <select style={inputStyle} value={form.dataAvailability} onChange={e => update('dataAvailability', e.target.value)}>
@@ -264,35 +241,32 @@ export default function Form() {
                   <option>Clean, structured data ready for AI use</option>
                 </select>
               </div>
-
               <div>
                 <label style={labelStyle}>
-                  Team AI Awareness Level: {['', 'No awareness', 'Heard of AI but not used it', 'Some staff use AI tools personally', 'Actively exploring AI for business', 'Already piloting AI projects'][form.aiAwarenessLevel]}
+                  Team AI Awareness: {['', 'No awareness', 'Heard of AI but not used it', 'Some staff use AI tools personally', 'Actively exploring AI for business', 'Already piloting AI projects'][form.aiAwarenessLevel]}
                 </label>
                 <input type="range" min="1" max="5" value={form.aiAwarenessLevel}
                   onChange={e => update('aiAwarenessLevel', e.target.value)}
-                  style={{ width: '100%', marginTop: 8, accentColor: 'var(--accent)' }} />
+                  style={{ width: '100%', marginTop: 8, accentColor: '#1e90ff' }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-light)' }}>
                   <span>No awareness</span><span>Actively piloting</span>
                 </div>
               </div>
-
               <div>
-                <label style={labelStyle}>Which AI use cases interest you most? (select all that apply)</label>
+                <label style={labelStyle}>Which AI use cases interest you most?</label>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10 }}>
                   {AI_USE_CASE_INTERESTS.map(item => (
-                    <div key={item}
-                      onClick={() => toggleItem('aiInterests', item)}
+                    <div key={item} onClick={() => toggleItem('aiInterests', item)}
                       style={{
                         padding: '11px 16px', borderRadius: 10, cursor: 'pointer',
-                        border: `2px solid ${form.aiInterests.includes(item) ? 'var(--accent)' : 'var(--border)'}`,
-                        background: form.aiInterests.includes(item) ? '#fff0e6' : 'white',
+                        border: `2px solid ${form.aiInterests.includes(item) ? '#1e90ff' : 'var(--border)'}`,
+                        background: form.aiInterests.includes(item) ? '#e8f4ff' : 'white',
                         display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.15s ease'
                       }}>
                       <div style={{
                         width: 18, height: 18, borderRadius: 5, flexShrink: 0,
-                        border: `2px solid ${form.aiInterests.includes(item) ? 'var(--accent)' : 'var(--border)'}`,
-                        background: form.aiInterests.includes(item) ? 'var(--accent)' : 'white',
+                        border: `2px solid ${form.aiInterests.includes(item) ? '#1e90ff' : 'var(--border)'}`,
+                        background: form.aiInterests.includes(item) ? '#1e90ff' : 'white',
                         display: 'flex', alignItems: 'center', justifyContent: 'center'
                       }}>
                         {form.aiInterests.includes(item) && <span style={{ color: 'white', fontSize: '0.65rem' }}>✓</span>}
@@ -302,10 +276,9 @@ export default function Form() {
                   ))}
                 </div>
               </div>
-
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                 <button className="btn-secondary" onClick={() => setStep(2)}>← Back</button>
-                <button className="btn-primary" onClick={() => setStep(4)}>Next →</button>
+                <button className="btn-primary" style={{ background: '#1e90ff' }} onClick={() => setStep(4)}>Next →</button>
               </div>
             </div>
           )}
@@ -314,22 +287,20 @@ export default function Form() {
           {step === 4 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
               <h2 style={{ fontSize: '1.3rem', marginBottom: 4 }}>Business Challenges</h2>
-              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: -12 }}>Select all that apply — this helps us prioritise your AI recommendations</p>
-
+              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: -12 }}>Select all that apply</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {PAIN_POINTS.map(point => (
-                  <div key={point}
-                    onClick={() => toggleItem('painPoints', point)}
+                  <div key={point} onClick={() => toggleItem('painPoints', point)}
                     style={{
                       padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
-                      border: `2px solid ${form.painPoints.includes(point) ? 'var(--accent)' : 'var(--border)'}`,
-                      background: form.painPoints.includes(point) ? '#fff0e6' : 'white',
+                      border: `2px solid ${form.painPoints.includes(point) ? '#1e90ff' : 'var(--border)'}`,
+                      background: form.painPoints.includes(point) ? '#e8f4ff' : 'white',
                       display: 'flex', alignItems: 'center', gap: 12, transition: 'all 0.15s ease'
                     }}>
                     <div style={{
                       width: 20, height: 20, borderRadius: 6, flexShrink: 0,
-                      border: `2px solid ${form.painPoints.includes(point) ? 'var(--accent)' : 'var(--border)'}`,
-                      background: form.painPoints.includes(point) ? 'var(--accent)' : 'white',
+                      border: `2px solid ${form.painPoints.includes(point) ? '#1e90ff' : 'var(--border)'}`,
+                      background: form.painPoints.includes(point) ? '#1e90ff' : 'white',
                       display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                       {form.painPoints.includes(point) && <span style={{ color: 'white', fontSize: '0.7rem' }}>✓</span>}
@@ -339,24 +310,20 @@ export default function Form() {
                 ))}
               </div>
 
-              {/* Dynamic Follow-up Questions */}
+              {/* Dynamic Follow-ups */}
               {form.painPoints.filter(p => FOLLOWUP_QUESTIONS[p]).map(point => {
                 const q = FOLLOWUP_QUESTIONS[point]
                 return (
-                  <div key={point} style={{ background: '#f0f7ff', border: '1.5px solid #c0d8f5', borderRadius: 12, padding: '16px 20px' }}>
-                    <p style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--primary)', marginBottom: 12 }}>
+                  <div key={point} style={{ background: '#e8f4ff', border: '1.5px solid #90caf9', borderRadius: 12, padding: '16px 20px' }}>
+                    <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1565c0', marginBottom: 12 }}>
                       🔍 {point}: {q.label}
                     </p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                       {q.options.map(opt => (
-                        <div key={opt}
-                          onClick={() => {
-                            const current = form[q.field] || []
-                            update(q.field, current.includes(opt)
-                              ? current.filter(x => x !== opt)
-                              : [...current, opt])
-                          }}
-                          style={chipStyle((form[q.field] || []).includes(opt))}>
+                        <div key={opt} onClick={() => {
+                          const current = form[q.field] || []
+                          update(q.field, current.includes(opt) ? current.filter(x => x !== opt) : [...current, opt])
+                        }} style={chipStyle((form[q.field] || []).includes(opt))}>
                           {opt}
                         </div>
                       ))}
@@ -372,10 +339,9 @@ export default function Form() {
                   value={form.otherPainPoints}
                   onChange={e => update('otherPainPoints', e.target.value)} />
               </div>
-
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                 <button className="btn-secondary" onClick={() => setStep(3)}>← Back</button>
-                <button className="btn-primary"
+                <button className="btn-primary" style={{ background: '#1e90ff' }}
                   disabled={form.painPoints.length === 0}
                   onClick={handleSubmit}>
                   Generate My AI Report 🚀
@@ -385,6 +351,13 @@ export default function Form() {
           )}
 
         </div>
+
+        {/* Footer */}
+        <div style={{ textAlign: 'center', marginTop: 32, paddingBottom: 40 }}>
+          <img src="/SAIA_black.jpeg" alt="SAIA" style={{ height: 24, objectFit: 'contain', opacity: 0.4 }} />
+          <p style={{ color: 'var(--text-light)', fontSize: '0.75rem', marginTop: 8 }}>© 2025 Singapore A.I. Association · Powered by Pantherpulse</p>
+        </div>
+
       </div>
     </div>
   )
