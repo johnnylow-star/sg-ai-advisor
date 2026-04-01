@@ -43,18 +43,19 @@ export default function Results() {
     generate()
   }, [])
 
+  // FIX 2 — Mobile loading screen with proper padding
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a, #0f4c81)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a, #0f4c81)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, padding: '0 32px' }}>
       <img src="/SAIA_white.jpeg" alt="SAIA" style={{ height: 48, objectFit: 'contain', marginBottom: 8 }} />
       <div style={{ width: 56, height: 56, border: '4px solid rgba(255,255,255,0.15)', borderTop: '4px solid #1e90ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-      <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>Analysing your AI readiness...</p>
-      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.88rem' }}>Researching industry benchmarks and generating your report...</p>
+      <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600, textAlign: 'center' }}>Analysing your AI readiness...</p>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.88rem', textAlign: 'center', maxWidth: 300, lineHeight: 1.6 }}>Researching industry benchmarks and generating your personalised report...</p>
     </div>
   )
 
   if (error) return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: '0 32px' }}>
       <p style={{ color: 'red' }}>{error}</p>
       <button className="btn-primary" onClick={() => navigate('/form')}>Try Again</button>
     </div>
@@ -97,6 +98,8 @@ export default function Results() {
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #0d2a4a 50%, #0f4c81 100%)', padding: '32px 24px 40px' }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
+
+          {/* FIX 4 — Use white logo on dark background (correct) */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
             <img src="/SAIA_white.jpeg" alt="Singapore AI Association" style={{ height: 36, objectFit: 'contain' }} />
             <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem' }}>Powered by Pantherpulse</span>
@@ -171,7 +174,7 @@ export default function Results() {
         </div>
       )}
 
-      {/* Tabs + Export Button */}
+      {/* FIX 1 — Tabs + Export PDF button aligned to top right */}
       <div style={{ background: 'white', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', overflowX: 'auto' }}>
@@ -188,19 +191,21 @@ export default function Results() {
               </button>
             ))}
           </div>
+          {/* Export PDF button - top right */}
           <button
             onClick={handleExportPDF}
             disabled={exporting}
             style={{
-              flexShrink: 0, marginRight: 16,
-              padding: '8px 18px', borderRadius: 50,
+              flexShrink: 0, marginRight: 16, marginLeft: 8,
+              padding: '9px 20px', borderRadius: 50,
               background: exporting ? '#ccc' : '#1e90ff',
               color: 'white', border: 'none',
               cursor: exporting ? 'not-allowed' : 'pointer',
               fontFamily: 'Plus Jakarta Sans, sans-serif',
-              fontWeight: 700, fontSize: '0.82rem', whiteSpace: 'nowrap'
+              fontWeight: 700, fontSize: '0.82rem',
+              whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: 6
             }}>
-            {exporting ? 'Generating...' : '⬇️ Export PDF'}
+            {exporting ? '⏳ Generating...' : '⬇️ Export PDF'}
           </button>
         </div>
       </div>
@@ -465,22 +470,47 @@ export default function Results() {
           </div>
         )}
 
-        {/* Bottom CTA */}
-        <div style={{ marginTop: 48, background: '#0a0f1e', borderRadius: 16, padding: '40px 32px', textAlign: 'center' }}>
-          <img src="/SAIA_white.jpeg" alt="SAIA" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
-          <h3 style={{ fontSize: '1.3rem', marginBottom: 8, color: 'white' }}>Want a deeper consultation?</h3>
-          <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 28, fontSize: '0.95rem' }}>Our team can provide a detailed AI readiness workshop tailored to your business.</p>
-          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn-primary" style={{ background: '#1e90ff' }} onClick={() => navigate('/form')}>Start New Assessment</button>
-            <button onClick={handleExportPDF} disabled={exporting}
-              style={{ padding: '14px 32px', borderRadius: 50, background: exporting ? '#333' : 'transparent', color: 'white', border: '2px solid rgba(255,255,255,0.3)', cursor: exporting ? 'not-allowed' : 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700, fontSize: '1rem' }}>
-              {exporting ? 'Generating PDF...' : '⬇️ Download PDF Report'}
+        {/* FIX 3 — Bottom CTA: Contact SAIA as primary, black logo, deemphasized secondary actions */}
+        <div style={{ marginTop: 48, background: 'white', borderRadius: 16, padding: '40px 32px', textAlign: 'center', border: '1px solid var(--border)' }}>
+          <img src="/SAIA_black.jpeg" alt="SAIA" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
+          <h3 style={{ fontSize: '1.3rem', marginBottom: 8, color: 'var(--text-dark)' }}>Ready to accelerate your AI journey?</h3>
+          <p style={{ color: 'var(--text-light)', marginBottom: 28, fontSize: '0.95rem' }}>Our team at SAIA can provide a detailed AI readiness workshop and implementation support tailored to your business.</p>
+
+          {/* Primary CTA — Contact SAIA */}
+          <a href="mailto:info@saia.org.sg" style={{ textDecoration: 'none' }}>
+            <button style={{
+              padding: '16px 40px', borderRadius: 50, background: '#1e90ff',
+              color: 'white', border: 'none', cursor: 'pointer',
+              fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700,
+              fontSize: '1rem', marginBottom: 20, display: 'block', margin: '0 auto 20px'
+            }}>
+              Contact SAIA →
             </button>
-            <a href="mailto:info@saia.org.sg" style={{ display: 'inline-flex', alignItems: 'center' }}>
-              <button className="btn-secondary" style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'white' }}>Contact SAIA →</button>
-            </a>
+          </a>
+
+          {/* Secondary deemphasized actions */}
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 16 }}>
+            <button onClick={() => navigate('/form')}
+              style={{
+                padding: '10px 22px', borderRadius: 50, background: 'transparent',
+                color: 'var(--text-light)', border: '1.5px solid var(--border)',
+                cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 600, fontSize: '0.85rem'
+              }}>
+              Start New Assessment
+            </button>
+            <button onClick={handleExportPDF} disabled={exporting}
+              style={{
+                padding: '10px 22px', borderRadius: 50, background: 'transparent',
+                color: 'var(--text-light)', border: '1.5px solid var(--border)',
+                cursor: exporting ? 'not-allowed' : 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 600, fontSize: '0.85rem'
+              }}>
+              {exporting ? 'Generating...' : '⬇️ Download PDF'}
+            </button>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', marginTop: 24 }}>© 2025 Singapore A.I. Association · Powered by Pantherpulse</p>
+          <p style={{ color: 'var(--text-light)', fontSize: '0.75rem', marginTop: 24, opacity: 0.5 }}>© 2025 Singapore A.I. Association · Powered by Pantherpulse</p>
         </div>
 
       </div>

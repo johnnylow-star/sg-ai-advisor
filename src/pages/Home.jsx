@@ -27,15 +27,15 @@ export default function Home() {
           Get a personalised AI Readiness Report for your Singapore business — including your readiness score, recommended AI use cases, workforce upskilling plan, and matched government grants.
         </p>
 
-        <button className="btn-primary" onClick={() => navigate('/form')} style={{ fontSize: '1.1rem', padding: '16px 40px' }}>
+        <button className="btn-primary" onClick={() => navigate('/form')} style={{ fontSize: '1.1rem', padding: '16px 40px', background: '#1e90ff' }}>
           Start Free Assessment →
         </button>
 
         <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.82rem', marginTop: 16 }}>Takes 3 minutes · No payment required · Instant results</p>
       </div>
 
-      {/* Readiness Dimensions */}
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 48px 40px' }}>
+      {/* FIX 5 — Section 1: AI Readiness Dimensions */}
+      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 48px 20px' }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 20 }}>
           We assess your AI readiness across 5 dimensions
         </p>
@@ -56,20 +56,31 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Feature Cards */}
-      <div style={{ maxWidth: 1000, margin: '0 auto', padding: '0 48px 80px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20, marginTop: 16 }}>
-        {[
-          { icon: '🎯', title: 'AI Readiness Score', desc: 'Scored across 5 dimensions with a clear overall rating' },
-          { icon: '🤖', title: 'AI Use Cases', desc: 'Specific AI applications recommended for your industry' },
-          { icon: '🎓', title: 'Workforce AI Plan', desc: 'Upskilling roadmap to build your team\'s AI capabilities' },
-          { icon: '💰', title: 'Grant Matching', desc: 'Singapore grants like DLP, PSG and EDG matched to your plan' },
-        ].map((f, i) => (
-          <div key={i} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: 16, padding: '28px 24px' }}>
-            <div style={{ fontSize: '2rem', marginBottom: 12 }}>{f.icon}</div>
-            <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: 700, marginBottom: 8, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{f.title}</h3>
-            <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem', lineHeight: 1.6 }}>{f.desc}</p>
-          </div>
-        ))}
+      {/* FIX 5 — Divider + Section 2 subheader clearly separated */}
+      <div style={{ maxWidth: 1000, margin: '40px auto 0', padding: '0 48px 80px' }}>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 40, marginBottom: 24 }}>
+          <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>
+            What you'll receive
+          </p>
+          <p style={{ color: 'white', textAlign: 'center', fontSize: '1.1rem', fontWeight: 700, fontFamily: 'Fraunces, serif', marginBottom: 24 }}>
+            Your personalised AI Readiness Report includes
+          </p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 20 }}>
+          {[
+            { icon: '🎯', title: 'AI Readiness Score', desc: 'Scored across 5 dimensions with a clear overall rating and gap analysis' },
+            { icon: '🤖', title: 'AI Use Cases', desc: 'Specific AI applications recommended for your industry and pain points' },
+            { icon: '🎓', title: 'Workforce AI Plan', desc: 'Upskilling roadmap to build your team\'s AI capabilities at every level' },
+            { icon: '💰', title: 'Grant Matching', desc: 'Singapore grants like DLP, PSG and EDG matched specifically to your plan' },
+          ].map((f, i) => (
+            <div key={i} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 16, padding: '28px 24px' }}>
+              <div style={{ fontSize: '2rem', marginBottom: 12 }}>{f.icon}</div>
+              <h3 style={{ color: 'white', fontSize: '1rem', fontWeight: 700, marginBottom: 8, fontFamily: 'Plus Jakarta Sans, sans-serif' }}>{f.title}</h3>
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem', lineHeight: 1.6 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Footer */}

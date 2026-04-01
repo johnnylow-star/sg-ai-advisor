@@ -284,13 +284,17 @@ export default function Form() {
           )}
 
           {/* STEP 4 — Pain Points */}
+          {/* FIX 6 — Follow-up appears inline directly below selected pain point */}
           {step === 4 && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               <h2 style={{ fontSize: '1.3rem', marginBottom: 4 }}>Business Challenges</h2>
-              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: -12 }}>Select all that apply</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {PAIN_POINTS.map(point => (
-                  <div key={point} onClick={() => toggleItem('painPoints', point)}
+              <p style={{ color: 'var(--text-light)', fontSize: '0.9rem', marginTop: -8, marginBottom: 8 }}>Select all that apply</p>
+
+              {PAIN_POINTS.map(point => (
+                <div key={point}>
+                  {/* Pain point row */}
+                  <div
+                    onClick={() => toggleItem('painPoints', point)}
                     style={{
                       padding: '12px 16px', borderRadius: 10, cursor: 'pointer',
                       border: `2px solid ${form.painPoints.includes(point) ? '#1e90ff' : 'var(--border)'}`,
@@ -307,38 +311,48 @@ export default function Form() {
                     </div>
                     <span style={{ fontSize: '0.92rem', color: 'var(--text-dark)' }}>{point}</span>
                   </div>
-                ))}
-              </div>
 
-              {/* Dynamic Follow-ups */}
-              {form.painPoints.filter(p => FOLLOWUP_QUESTIONS[p]).map(point => {
-                const q = FOLLOWUP_QUESTIONS[point]
-                return (
-                  <div key={point} style={{ background: '#e8f4ff', border: '1.5px solid #90caf9', borderRadius: 12, padding: '16px 20px' }}>
-                    <p style={{ fontSize: '0.88rem', fontWeight: 700, color: '#1565c0', marginBottom: 12 }}>
-                      🔍 {point}: {q.label}
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {q.options.map(opt => (
-                        <div key={opt} onClick={() => {
-                          const current = form[q.field] || []
-                          update(q.field, current.includes(opt) ? current.filter(x => x !== opt) : [...current, opt])
-                        }} style={chipStyle((form[q.field] || []).includes(opt))}>
-                          {opt}
+                  {/* FIX 6 — Follow-up question appears directly below if selected */}
+                  {form.painPoints.includes(point) && FOLLOWUP_QUESTIONS[point] && (() => {
+                    const q = FOLLOWUP_QUESTIONS[point]
+                    return (
+                      <div style={{
+                        background: '#e8f4ff', border: '1.5px solid #90caf9',
+                        borderRadius: '0 0 10px 10px', padding: '14px 16px',
+                        marginTop: -2
+                      }}>
+                        <p style={{ fontSize: '0.82rem', fontWeight: 700, color: '#1565c0', marginBottom: 10 }}>
+                          ↳ {q.label}
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {q.options.map(opt => (
+                            <div key={opt}
+                              onClick={e => {
+                                e.stopPropagation()
+                                const current = form[q.field] || []
+                                update(q.field, current.includes(opt)
+                                  ? current.filter(x => x !== opt)
+                                  : [...current, opt])
+                              }}
+                              style={chipStyle((form[q.field] || []).includes(opt))}>
+                              {opt}
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
+                      </div>
+                    )
+                  })()}
+                </div>
+              ))}
 
-              <div>
+              <div style={{ marginTop: 12 }}>
                 <label style={labelStyle}>Any other challenges or context? (optional)</label>
                 <textarea style={{ ...inputStyle, height: 90, resize: 'vertical' }}
                   placeholder="Tell us anything else about your AI ambitions or concerns..."
                   value={form.otherPainPoints}
                   onChange={e => update('otherPainPoints', e.target.value)} />
               </div>
+
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 8 }}>
                 <button className="btn-secondary" onClick={() => setStep(3)}>← Back</button>
                 <button className="btn-primary" style={{ background: '#1e90ff' }}
