@@ -35,7 +35,7 @@ export default function ResultsHeader({ formData, roadmap, scores, exporting, on
             <div>
               <div style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>{roadmap?.readinessLevel?.label}</div>
               <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.82rem', maxWidth: 260, lineHeight: 1.5, marginTop: 4 }}>
-                {roadmap?.readinessLevel?.description?.substring(0, 90)}...
+                {roadmap?.readinessLevel?.description}
               </div>
             </div>
           </div>
