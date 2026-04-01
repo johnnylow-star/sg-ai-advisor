@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { generateRoadmap } from '../services/aiService'
 import { saveSubmission } from '../services/firestoreService'
+import { exportToPDF } from '../services/pdfService'
 
 export default function Results() {
   const location = useLocation()
@@ -12,6 +13,18 @@ export default function Results() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('score')
+  const [exporting, setExporting] = useState(false)
+
+  const handleExportPDF = async () => {
+    setExporting(true)
+    try {
+      await exportToPDF(roadmap, formData)
+    } catch (err) {
+      console.error('PDF export failed:', err)
+    } finally {
+      setExporting(false)
+    }
+  }
 
   useEffect(() => {
     if (!formData) { navigate('/form'); return }
@@ -31,17 +44,18 @@ export default function Results() {
   }, [])
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0d1b2a, #0f4c81)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
-      <div style={{ width: 56, height: 56, border: '4px solid rgba(255,255,255,0.2)', borderTop: '4px solid #ff8c42', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a, #0f4c81)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
+      <img src="/SAIA_white.jpeg" alt="SAIA" style={{ height: 48, objectFit: 'contain', marginBottom: 8 }} />
+      <div style={{ width: 56, height: 56, border: '4px solid rgba(255,255,255,0.15)', borderTop: '4px solid #1e90ff', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
       <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>Analysing your AI readiness...</p>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem' }}>Researching industry benchmarks and generating your report...</p>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.88rem' }}>Researching industry benchmarks and generating your report...</p>
     </div>
   )
 
   if (error) return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-      <p style={{ color: 'red', fontSize: '1rem' }}>{error}</p>
+      <p style={{ color: 'red' }}>{error}</p>
       <button className="btn-primary" onClick={() => navigate('/form')}>Try Again</button>
     </div>
   )
@@ -57,8 +71,8 @@ export default function Results() {
 
   const scores = roadmap?.readinessScores
   const dimensions = scores ? [
-    { key: 'dataReadiness', label: 'Data Readiness', icon: '🗄️', color: '#7c3aed' },
-    { key: 'aiStrategy', label: 'AI Strategy', icon: '🧭', color: '#0f4c81' },
+    { key: 'dataReadiness', label: 'Data Readiness', icon: '🗄️', color: '#1e90ff' },
+    { key: 'aiStrategy', label: 'AI Strategy', icon: '🧭', color: '#0d2a4a' },
     { key: 'workforceSkills', label: 'Workforce & Skills', icon: '👥', color: '#0a8754' },
     { key: 'techInfrastructure', label: 'Tech Infrastructure', icon: '⚙️', color: '#e8630a' },
     { key: 'ethicsGovernance', label: 'Ethics & Governance', icon: '🛡️', color: '#dc2626' },
@@ -78,50 +92,47 @@ export default function Results() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+    <div style={{ minHeight: '100vh', background: '#f0f4f8' }}>
 
       {/* Header */}
-      <div style={{ background: 'linear-gradient(135deg, #0d1b2a, #0f4c81)', padding: '40px 24px' }}>
+      <div style={{ background: 'linear-gradient(135deg, #0a0f1e 0%, #0d2a4a 50%, #0f4c81 100%)', padding: '32px 24px 40px' }}>
         <div style={{ maxWidth: 960, margin: '0 auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-            <div style={{ width: 32, height: 32, background: '#e8630a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: '0.85rem' }}>AI</div>
-            <div>
-              <div style={{ fontWeight: 800, color: 'white', fontSize: '0.95rem' }}>Singapore AI Association</div>
-              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Readiness Toolkit</div>
-            </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+            <img src="/SAIA_white.jpeg" alt="Singapore AI Association" style={{ height: 36, objectFit: 'contain' }} />
+            <span style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.78rem' }}>Powered by Pantherpulse</span>
           </div>
 
-          <span className="tag tag-orange" style={{ marginBottom: 16 }}>Your AI Readiness Report</span>
+          <span className="tag" style={{ background: 'rgba(30,144,255,0.2)', color: '#60b4ff', border: '1px solid rgba(30,144,255,0.3)', marginBottom: 16 }}>
+            Your AI Readiness Report
+          </span>
           <h1 style={{ color: 'white', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', marginBottom: 12 }}>
             AI Readiness Assessment
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: 20 }}>
+          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem', marginBottom: 24 }}>
             {formData.companyName} · {formData.industry} · {formData.employeeCount} employees
           </p>
 
-          {/* Overall Score + Level */}
+          {/* Overall Score */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '16px 24px', border: '1px solid rgba(255,255,255,0.15)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'rgba(255,255,255,0.08)', borderRadius: 14, padding: '16px 24px', border: '1px solid rgba(255,255,255,0.12)' }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '2.8rem', fontWeight: 900, color: getScoreColor(scores?.overall || 0), fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: 1 }}>
+                <div style={{ fontSize: '2.8rem', fontWeight: 900, color: getScoreColor(scores?.overall || 0), lineHeight: 1 }}>
                   {scores?.overall || '--'}
                 </div>
-                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginTop: 4 }}>out of 100</div>
+                <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem', marginTop: 4 }}>out of 100</div>
               </div>
               <div>
                 <div style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>{roadmap?.readinessLevel?.label}</div>
-                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', maxWidth: 260, lineHeight: 1.5, marginTop: 4 }}>
-                  {roadmap?.readinessLevel?.description?.substring(0, 80)}...
+                <div style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.82rem', maxWidth: 260, lineHeight: 1.5, marginTop: 4 }}>
+                  {roadmap?.readinessLevel?.description?.substring(0, 90)}...
                 </div>
               </div>
             </div>
-
-            {/* Confidence */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ height: 6, width: 120, background: 'rgba(255,255,255,0.2)', borderRadius: 10 }}>
+              <div style={{ height: 6, width: 120, background: 'rgba(255,255,255,0.15)', borderRadius: 10 }}>
                 <div style={{ height: '100%', width: `${roadmap?.confidenceScore}%`, background: roadmap?.confidenceScore >= 60 ? '#4ade80' : '#fbbf24', borderRadius: 10 }} />
               </div>
-              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>
+              <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>
                 Data confidence: {roadmap?.confidenceScore}/100
               </span>
             </div>
@@ -129,8 +140,8 @@ export default function Results() {
 
           {/* Executive Summary */}
           {roadmap?.executiveSummary && (
-            <div style={{ marginTop: 24, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 12, padding: '20px 24px' }}>
-              <p style={{ color: 'rgba(255,255,255,0.85)', lineHeight: 1.8, fontSize: '0.95rem' }}>{roadmap.executiveSummary}</p>
+            <div style={{ marginTop: 24, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, padding: '20px 24px' }}>
+              <p style={{ color: 'rgba(255,255,255,0.82)', lineHeight: 1.8, fontSize: '0.95rem' }}>{roadmap.executiveSummary}</p>
             </div>
           )}
         </div>
@@ -142,7 +153,7 @@ export default function Results() {
           <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.2rem' }}>⚠️</span>
             <p style={{ fontSize: '0.88rem', color: '#92400e', lineHeight: 1.6 }}>
-              <strong>Based on Industry Benchmarks:</strong> Limited company-specific data was provided. This report reflects Singapore AI readiness benchmarks for your industry and company size. For a fully personalised assessment, complete all fields or contact the Singapore AI Association directly for a consultation.
+              <strong>Based on Industry Benchmarks:</strong> Limited company-specific data was provided. This report reflects Singapore AI readiness benchmarks for your industry and company size. For a fully personalised assessment, contact SAIA directly.
             </p>
           </div>
         </div>
@@ -150,31 +161,47 @@ export default function Results() {
 
       {/* Website Insights */}
       {roadmap?.websiteInsights && (
-        <div style={{ background: '#f0f7ff', borderBottom: '1px solid #c0d8f5', padding: '14px 24px' }}>
+        <div style={{ background: '#e8f4ff', borderBottom: '1px solid #90caf9', padding: '14px 24px' }}>
           <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.2rem' }}>🌐</span>
-            <p style={{ fontSize: '0.88rem', color: '#1e3a5f', lineHeight: 1.6 }}>
+            <p style={{ fontSize: '0.88rem', color: '#1565c0', lineHeight: 1.6 }}>
               <strong>Website Analysis:</strong> {roadmap.websiteInsights}
             </p>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs + Export Button */}
       <div style={{ background: 'white', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', overflowX: 'auto' }}>
-          {tabs.map(tab => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '16px 20px', border: 'none', background: 'none', cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.85rem',
-                color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-light)',
-                borderBottom: activeTab === tab.id ? '3px solid var(--accent)' : '3px solid transparent',
-                whiteSpace: 'nowrap', transition: 'all 0.2s ease'
-              }}>
-              {tab.label}
-            </button>
-          ))}
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', overflowX: 'auto' }}>
+            {tabs.map(tab => (
+              <button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                style={{
+                  padding: '16px 20px', border: 'none', background: 'none', cursor: 'pointer',
+                  fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.85rem',
+                  color: activeTab === tab.id ? '#1e90ff' : 'var(--text-light)',
+                  borderBottom: activeTab === tab.id ? '3px solid #1e90ff' : '3px solid transparent',
+                  whiteSpace: 'nowrap', transition: 'all 0.2s ease'
+                }}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={handleExportPDF}
+            disabled={exporting}
+            style={{
+              flexShrink: 0, marginRight: 16,
+              padding: '8px 18px', borderRadius: 50,
+              background: exporting ? '#ccc' : '#1e90ff',
+              color: 'white', border: 'none',
+              cursor: exporting ? 'not-allowed' : 'pointer',
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontWeight: 700, fontSize: '0.82rem', whiteSpace: 'nowrap'
+            }}>
+            {exporting ? 'Generating...' : '⬇️ Export PDF'}
+          </button>
         </div>
       </div>
 
@@ -184,13 +211,10 @@ export default function Results() {
         {/* AI READINESS SCORE TAB */}
         {activeTab === 'score' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-
-            <div className="card" style={{ background: 'linear-gradient(135deg, #e0ecff, #f0f7ff)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Your AI Readiness Breakdown</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>{roadmap?.readinessLevel?.description}</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>Your AI Readiness Breakdown</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>{roadmap?.readinessLevel?.description}</p>
             </div>
-
-            {/* Score Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
               {dimensions.map(dim => {
                 const s = scores?.[dim.key]
@@ -207,30 +231,29 @@ export default function Results() {
                       </div>
                     </div>
                     <div style={{ height: 8, background: 'var(--border)', borderRadius: 10, marginBottom: 12 }}>
-                      <div style={{ height: '100%', width: `${s?.score || 0}%`, background: dim.color, borderRadius: 10, transition: 'width 1s ease' }} />
+                      <div style={{ height: '100%', width: `${s?.score || 0}%`, background: dim.color, borderRadius: 10 }} />
                     </div>
                     <p style={{ fontSize: '0.88rem', color: 'var(--text-mid)', lineHeight: 1.6 }}>{s?.insight}</p>
                   </div>
                 )
               })}
             </div>
-
           </div>
         )}
 
         {/* AI USE CASES TAB */}
         {activeTab === 'usecases' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg, #fff0e6, #fff8f3)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🤖 Recommended AI Use Cases</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>These AI applications are specifically recommended for {formData.companyName} based on your industry, pain points and AI interests.</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>🤖 Recommended AI Use Cases</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>Specifically recommended for {formData.companyName} based on your industry and AI interests.</p>
             </div>
             {roadmap?.aiUseCases?.map((uc, i) => (
               <div key={i} className="card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
                   <h3 style={{ fontSize: '1.05rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700 }}>{uc.title}</h3>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    <span className="tag" style={{ background: uc.priority === 'High' ? '#fff0e6' : '#f0f7ff', color: uc.priority === 'High' ? 'var(--accent)' : 'var(--primary)' }}>
+                    <span className="tag" style={{ background: uc.priority === 'High' ? '#e8f4ff' : '#f0f7ff', color: uc.priority === 'High' ? '#1e90ff' : 'var(--primary)' }}>
                       {uc.priority} Priority
                     </span>
                     <span className="tag tag-blue">{uc.effort} Effort</span>
@@ -242,7 +265,7 @@ export default function Results() {
                     <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Suggested Tools</p>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                       {uc.tools?.map((t, j) => (
-                        <span key={j} style={{ background: '#f0f7ff', color: 'var(--primary)', padding: '4px 10px', borderRadius: 50, fontSize: '0.8rem', fontWeight: 600 }}>{t}</span>
+                        <span key={j} style={{ background: '#e8f4ff', color: '#1e90ff', padding: '4px 10px', borderRadius: 50, fontSize: '0.8rem', fontWeight: 600 }}>{t}</span>
                       ))}
                     </div>
                   </div>
@@ -259,14 +282,14 @@ export default function Results() {
         {/* ROADMAP TAB */}
         {activeTab === 'roadmap' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg, #e0f5ed, #f0fdf7)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🗺️ Your AI Transformation Roadmap</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>A phased plan to build your AI capabilities over 12 months.</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>🗺️ Your AI Transformation Roadmap</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>A phased plan to build your AI capabilities over 12 months.</p>
             </div>
             {roadmap?.roadmap?.map((phase, i) => (
-              <div key={i} className="card" style={{ borderLeft: `4px solid ${['#e8630a', '#0f4c81', '#0a8754'][i]}` }}>
+              <div key={i} className="card" style={{ borderLeft: `4px solid ${['#1e90ff', '#0d2a4a', '#0a8754'][i]}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: ['#fff0e6', '#e0ecff', '#e0f5ed'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: ['#e8630a', '#0f4c81', '#0a8754'][i] }}>{i + 1}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: ['#e8f4ff', '#e8eaf6', '#e0f5ed'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: ['#1e90ff', '#0d2a4a', '#0a8754'][i] }}>{i + 1}</div>
                   <div>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-light)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{phase.phase} · {phase.duration}</p>
                     <h3 style={{ fontSize: '1.1rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700 }}>{phase.title}</h3>
@@ -286,9 +309,9 @@ export default function Results() {
         {/* TRAINING TAB */}
         {activeTab === 'training' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg, #e0ecff, #f0f7ff)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🎓 AI Workforce Development Plan</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Upskilling roadmap to build your team's AI capabilities across all levels.</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>🎓 AI Workforce Development Plan</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>Upskilling roadmap to build your team's AI capabilities across all levels.</p>
             </div>
             {roadmap?.trainingPlan?.map((plan, i) => (
               <div key={i} className="card">
@@ -318,9 +341,9 @@ export default function Results() {
         {/* COMPLIANCE TAB */}
         {activeTab === 'compliance' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg, #fdf2f8, #fce7f3)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🛡️ AI Compliance & Governance</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Singapore-specific compliance requirements for responsible AI adoption — covering PDPA, Cybersecurity and AI Governance frameworks.</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>🛡️ AI Compliance & Governance</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>Singapore-specific compliance for responsible AI — covering PDPA, Cybersecurity and AI Governance.</p>
             </div>
 
             {/* PDPA */}
@@ -386,11 +409,11 @@ export default function Results() {
             </div>
 
             {/* AI Governance */}
-            <div className="card" style={{ borderLeft: '4px solid #0f4c81' }}>
+            <div className="card" style={{ borderLeft: '4px solid #1e90ff' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
                 <span style={{ fontSize: '1.4rem' }}>🤖</span>
                 <div>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f4c81', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IMDA / PDPC Singapore</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1e90ff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>IMDA / PDPC Singapore</span>
                   <h3 style={{ fontSize: '1.05rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700 }}>AI Governance & Ethics</h3>
                 </div>
               </div>
@@ -411,7 +434,7 @@ export default function Results() {
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {roadmap?.compliance?.aiGovernance?.resources?.map((r, i) => (
-                  <a key={i} href={r.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#e0ecff', color: '#0f4c81', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>{r.name} →</a>
+                  <a key={i} href={r.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#e8f4ff', color: '#1e90ff', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>{r.name} →</a>
                 ))}
               </div>
             </div>
@@ -421,9 +444,9 @@ export default function Results() {
         {/* GRANTS TAB */}
         {activeTab === 'grants' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="card" style={{ background: 'linear-gradient(135deg, #e0f5ed, #f0fdf7)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>💰 Matched Singapore AI Grants</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Government funding opportunities matched to your AI transformation plan.</p>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #0a0f1e, #0d2a4a)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8, color: 'white' }}>💰 Matched Singapore AI Grants</h2>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.92rem' }}>Government funding opportunities matched to your AI transformation plan.</p>
             </div>
             {roadmap?.grants?.map((grant, i) => (
               <div key={i} className="card">
@@ -434,7 +457,7 @@ export default function Results() {
                 <p style={{ fontSize: '0.82rem', color: 'var(--text-light)', marginBottom: 12 }}>Administered by: <strong>{grant.body}</strong></p>
                 <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem', lineHeight: 1.7, marginBottom: 16 }}>{grant.relevance}</p>
                 <a href={grant.url} target="_blank" rel="noreferrer"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--primary)', fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }}>
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: '#1e90ff', fontWeight: 600, fontSize: '0.88rem', textDecoration: 'none' }}>
                   Learn more & apply →
                 </a>
               </div>
@@ -443,19 +466,21 @@ export default function Results() {
         )}
 
         {/* Bottom CTA */}
-        <div style={{ marginTop: 48, textAlign: 'center', padding: '40px 24px', background: 'white', borderRadius: 16, border: '1px solid var(--border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
-            <div style={{ width: 28, height: 28, background: '#e8630a', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: '0.8rem' }}>AI</div>
-            <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Singapore AI Association</span>
-          </div>
-          <h3 style={{ fontSize: '1.3rem', marginBottom: 8 }}>Want a deeper consultation?</h3>
-          <p style={{ color: 'var(--text-light)', marginBottom: 24, fontSize: '0.95rem' }}>Our team can provide a detailed AI readiness workshop tailored to your business.</p>
+        <div style={{ marginTop: 48, background: '#0a0f1e', borderRadius: 16, padding: '40px 32px', textAlign: 'center' }}>
+          <img src="/SAIA_white.jpeg" alt="SAIA" style={{ height: 40, objectFit: 'contain', marginBottom: 20 }} />
+          <h3 style={{ fontSize: '1.3rem', marginBottom: 8, color: 'white' }}>Want a deeper consultation?</h3>
+          <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 28, fontSize: '0.95rem' }}>Our team can provide a detailed AI readiness workshop tailored to your business.</p>
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="btn-primary" onClick={() => navigate('/form')}>Start New Assessment</button>
+            <button className="btn-primary" style={{ background: '#1e90ff' }} onClick={() => navigate('/form')}>Start New Assessment</button>
+            <button onClick={handleExportPDF} disabled={exporting}
+              style={{ padding: '14px 32px', borderRadius: 50, background: exporting ? '#333' : 'transparent', color: 'white', border: '2px solid rgba(255,255,255,0.3)', cursor: exporting ? 'not-allowed' : 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700, fontSize: '1rem' }}>
+              {exporting ? 'Generating PDF...' : '⬇️ Download PDF Report'}
+            </button>
             <a href="mailto:info@saia.org.sg" style={{ display: 'inline-flex', alignItems: 'center' }}>
-              <button className="btn-secondary">Contact SAIA →</button>
+              <button className="btn-secondary" style={{ borderColor: 'rgba(255,255,255,0.3)', color: 'white' }}>Contact SAIA →</button>
             </a>
           </div>
+          <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem', marginTop: 24 }}>© 2025 Singapore A.I. Association · Powered by Pantherpulse</p>
         </div>
 
       </div>
