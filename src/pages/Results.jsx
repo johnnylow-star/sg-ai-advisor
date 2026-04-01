@@ -39,7 +39,7 @@ export default function Results() {
   }
 
   useEffect(() => {
-    if (!formData) { navigate('/form'); return }
+    if (!formData) { navigate('/'); return }
     async function generate() {
       try {
         const result = await generateRoadmap(formData)
