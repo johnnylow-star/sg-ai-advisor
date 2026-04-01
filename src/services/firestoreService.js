@@ -5,24 +5,35 @@ export async function saveSubmission(formData, roadmapData) {
   try {
     const docRef = await addDoc(collection(db, 'submissions'), {
       // Contact Info
-      name: formData.name,
-      email: formData.email,
-      jobTitle: formData.jobTitle,
+      name: formData.name || '',
+      email: formData.email || '',
+      jobTitle: formData.jobTitle || '',
 
       // Company Info
-      companyName: formData.companyName,
-      industry: formData.industry,
-      employeeCount: formData.employeeCount,
-      revenue: formData.revenue,
-      currentTools: formData.currentTools,
-      techLevel: formData.techLevel,
+      companyName: formData.companyName || '',
+      industry: formData.industry || '',
+      employeeCount: formData.employeeCount || '',
+      revenue: formData.revenue || '',
+      websiteUrl: formData.websiteUrl || '',
+
+      // AI Readiness
+      currentAiTools: formData.currentAiTools || '',
+      techInfrastructure: formData.techInfrastructure || '',
+      dataAvailability: formData.dataAvailability || '',
+      aiAwarenessLevel: formData.aiAwarenessLevel || '1',
+      aiInterests: formData.aiInterests || [],
 
       // Pain Points
-      painPoints: formData.painPoints,
-      otherPainPoints: formData.otherPainPoints,
+      painPoints: formData.painPoints || [],
+      otherPainPoints: formData.otherPainPoints || '',
+      marketingChannels: formData.marketingChannels || [],
+      cxBreakdown: formData.cxBreakdown || [],
+      cyberConcerns: formData.cyberConcerns || [],
+      pdpaConcerns: formData.pdpaConcerns || [],
+      dataState: formData.dataState || [],
 
-      // AI Generated Roadmap
-      roadmap: roadmapData,
+      // AI Generated Report
+      report: roadmapData || {},
 
       // Timestamp
       createdAt: serverTimestamp()
