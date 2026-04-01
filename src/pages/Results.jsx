@@ -11,7 +11,7 @@ export default function Results() {
   const [roadmap, setRoadmap] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [activeTab, setActiveTab] = useState('roadmap')
+  const [activeTab, setActiveTab] = useState('score')
 
   useEffect(() => {
     if (!formData) { navigate('/form'); return }
@@ -21,7 +21,7 @@ export default function Results() {
         setRoadmap(result)
         await saveSubmission(formData, result)
       } catch (err) {
-        setError('Failed to generate roadmap. Please try again.')
+        setError('Failed to generate report. Please try again.')
         console.error(err)
       } finally {
         setLoading(false)
@@ -34,8 +34,8 @@ export default function Results() {
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0d1b2a, #0f4c81)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
       <div style={{ width: 56, height: 56, border: '4px solid rgba(255,255,255,0.2)', borderTop: '4px solid #ff8c42', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-      <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>Generating your personalised roadmap...</p>
-      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem' }}>Analysing your profile and researching best practices...</p>
+      <p style={{ color: 'white', fontSize: '1.1rem', fontWeight: 600 }}>Analysing your AI readiness...</p>
+      <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.88rem' }}>Researching industry benchmarks and generating your report...</p>
     </div>
   )
 
@@ -47,39 +47,84 @@ export default function Results() {
   )
 
   const tabs = [
+    { id: 'score', label: '🎯 AI Readiness Score' },
+    { id: 'usecases', label: '🤖 AI Use Cases' },
     { id: 'roadmap', label: '🗺️ Roadmap' },
-    { id: 'methodology', label: '⚙️ Methodology' },
-    { id: 'training', label: '🎓 Training' },
+    { id: 'training', label: '🎓 Workforce Plan' },
     { id: 'compliance', label: '🛡️ Compliance' },
     { id: 'grants', label: '💰 Grants' },
   ]
+
+  const scores = roadmap?.readinessScores
+  const dimensions = scores ? [
+    { key: 'dataReadiness', label: 'Data Readiness', icon: '🗄️', color: '#7c3aed' },
+    { key: 'aiStrategy', label: 'AI Strategy', icon: '🧭', color: '#0f4c81' },
+    { key: 'workforceSkills', label: 'Workforce & Skills', icon: '👥', color: '#0a8754' },
+    { key: 'techInfrastructure', label: 'Tech Infrastructure', icon: '⚙️', color: '#e8630a' },
+    { key: 'ethicsGovernance', label: 'Ethics & Governance', icon: '🛡️', color: '#dc2626' },
+  ] : []
+
+  const getScoreColor = (score) => {
+    if (score >= 70) return '#0a8754'
+    if (score >= 40) return '#e8630a'
+    return '#dc2626'
+  }
+
+  const getScoreLabel = (score) => {
+    if (score >= 70) return 'Advanced'
+    if (score >= 50) return 'Established'
+    if (score >= 30) return 'Emerging'
+    return 'Beginning'
+  }
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #0d1b2a, #0f4c81)', padding: '40px 24px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-            <div style={{ width: 32, height: 32, background: '#e8630a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white' }}>SG</div>
-            <span style={{ fontWeight: 700, color: 'white' }}>AI Advisor</span>
+            <div style={{ width: 32, height: 32, background: '#e8630a', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: '0.85rem' }}>AI</div>
+            <div>
+              <div style={{ fontWeight: 800, color: 'white', fontSize: '0.95rem' }}>Singapore AI Association</div>
+              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Readiness Toolkit</div>
+            </div>
           </div>
-          <span className="tag tag-orange" style={{ marginBottom: 16 }}>Your Personalised Plan</span>
+
+          <span className="tag tag-orange" style={{ marginBottom: 16 }}>Your AI Readiness Report</span>
           <h1 style={{ color: 'white', fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', marginBottom: 12 }}>
-            Digital Transformation Roadmap
+            AI Readiness Assessment
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem' }}>
+          <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem', marginBottom: 20 }}>
             {formData.companyName} · {formData.industry} · {formData.employeeCount} employees
           </p>
 
-          {/* Confidence Score */}
-          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ height: 6, width: 160, background: 'rgba(255,255,255,0.2)', borderRadius: 10 }}>
-              <div style={{ height: '100%', width: `${roadmap?.confidenceScore}%`, background: roadmap?.confidenceScore >= 60 ? '#4ade80' : roadmap?.confidenceScore >= 40 ? '#fbbf24' : '#f87171', borderRadius: 10 }} />
+          {/* Overall Score + Level */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'rgba(255,255,255,0.1)', borderRadius: 14, padding: '16px 24px', border: '1px solid rgba(255,255,255,0.15)' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '2.8rem', fontWeight: 900, color: getScoreColor(scores?.overall || 0), fontFamily: 'Plus Jakarta Sans, sans-serif', lineHeight: 1 }}>
+                  {scores?.overall || '--'}
+                </div>
+                <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem', marginTop: 4 }}>out of 100</div>
+              </div>
+              <div>
+                <div style={{ color: 'white', fontWeight: 700, fontSize: '1.1rem' }}>{roadmap?.readinessLevel?.label}</div>
+                <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.82rem', maxWidth: 260, lineHeight: 1.5, marginTop: 4 }}>
+                  {roadmap?.readinessLevel?.description?.substring(0, 80)}...
+                </div>
+              </div>
             </div>
-            <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.82rem' }}>
-              Data confidence: {roadmap?.confidenceScore}/100
-            </span>
+
+            {/* Confidence */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ height: 6, width: 120, background: 'rgba(255,255,255,0.2)', borderRadius: 10 }}>
+                <div style={{ height: '100%', width: `${roadmap?.confidenceScore}%`, background: roadmap?.confidenceScore >= 60 ? '#4ade80' : '#fbbf24', borderRadius: 10 }} />
+              </div>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem' }}>
+                Data confidence: {roadmap?.confidenceScore}/100
+              </span>
+            </div>
           </div>
 
           {/* Executive Summary */}
@@ -94,19 +139,19 @@ export default function Results() {
       {/* Low Data Disclaimer */}
       {roadmap?.isLowDataPlan && (
         <div style={{ background: '#fffbeb', borderBottom: '1px solid #fde68a', padding: '14px 24px' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.2rem' }}>⚠️</span>
             <p style={{ fontSize: '0.88rem', color: '#92400e', lineHeight: 1.6 }}>
-              <strong>Based on Industry Best Practices:</strong> Limited company-specific information was provided. This roadmap reflects Singapore market benchmarks for your industry and company size. For a fully customised plan, we recommend providing your website URL and completing all fields, or engaging a digital transformation consultant for a detailed assessment.
+              <strong>Based on Industry Benchmarks:</strong> Limited company-specific data was provided. This report reflects Singapore AI readiness benchmarks for your industry and company size. For a fully personalised assessment, complete all fields or contact the Singapore AI Association directly for a consultation.
             </p>
           </div>
         </div>
       )}
 
-      {/* Website Insights Banner */}
+      {/* Website Insights */}
       {roadmap?.websiteInsights && (
         <div style={{ background: '#f0f7ff', borderBottom: '1px solid #c0d8f5', padding: '14px 24px' }}>
-          <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+          <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <span style={{ fontSize: '1.2rem' }}>🌐</span>
             <p style={{ fontSize: '0.88rem', color: '#1e3a5f', lineHeight: 1.6 }}>
               <strong>Website Analysis:</strong> {roadmap.websiteInsights}
@@ -117,12 +162,12 @@ export default function Results() {
 
       {/* Tabs */}
       <div style={{ background: 'white', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 10 }}>
-        <div style={{ maxWidth: 900, margin: '0 auto', display: 'flex', overflowX: 'auto' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', overflowX: 'auto' }}>
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
               style={{
-                padding: '16px 24px', border: 'none', background: 'none', cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.9rem',
+                padding: '16px 20px', border: 'none', background: 'none', cursor: 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 600, fontSize: '0.85rem',
                 color: activeTab === tab.id ? 'var(--accent)' : 'var(--text-light)',
                 borderBottom: activeTab === tab.id ? '3px solid var(--accent)' : '3px solid transparent',
                 whiteSpace: 'nowrap', transition: 'all 0.2s ease'
@@ -133,25 +178,95 @@ export default function Results() {
         </div>
       </div>
 
-      {/* Content */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
+      {/* Tab Content */}
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '40px 24px' }}>
+
+        {/* AI READINESS SCORE TAB */}
+        {activeTab === 'score' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+
+            <div className="card" style={{ background: 'linear-gradient(135deg, #e0ecff, #f0f7ff)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Your AI Readiness Breakdown</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>{roadmap?.readinessLevel?.description}</p>
+            </div>
+
+            {/* Score Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
+              {dimensions.map(dim => {
+                const s = scores?.[dim.key]
+                return (
+                  <div key={dim.key} className="card" style={{ borderTop: `4px solid ${dim.color}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                      <div>
+                        <span style={{ fontSize: '1.4rem' }}>{dim.icon}</span>
+                        <h3 style={{ fontSize: '0.95rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700, marginTop: 8 }}>{dim.label}</h3>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontSize: '2rem', fontWeight: 900, color: getScoreColor(s?.score || 0), lineHeight: 1 }}>{s?.score || '--'}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: 2 }}>{getScoreLabel(s?.score || 0)}</div>
+                      </div>
+                    </div>
+                    <div style={{ height: 8, background: 'var(--border)', borderRadius: 10, marginBottom: 12 }}>
+                      <div style={{ height: '100%', width: `${s?.score || 0}%`, background: dim.color, borderRadius: 10, transition: 'width 1s ease' }} />
+                    </div>
+                    <p style={{ fontSize: '0.88rem', color: 'var(--text-mid)', lineHeight: 1.6 }}>{s?.insight}</p>
+                  </div>
+                )
+              })}
+            </div>
+
+          </div>
+        )}
+
+        {/* AI USE CASES TAB */}
+        {activeTab === 'usecases' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #fff0e6, #fff8f3)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🤖 Recommended AI Use Cases</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>These AI applications are specifically recommended for {formData.companyName} based on your industry, pain points and AI interests.</p>
+            </div>
+            {roadmap?.aiUseCases?.map((uc, i) => (
+              <div key={i} className="card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+                  <h3 style={{ fontSize: '1.05rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700 }}>{uc.title}</h3>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <span className="tag" style={{ background: uc.priority === 'High' ? '#fff0e6' : '#f0f7ff', color: uc.priority === 'High' ? 'var(--accent)' : 'var(--primary)' }}>
+                      {uc.priority} Priority
+                    </span>
+                    <span className="tag tag-blue">{uc.effort} Effort</span>
+                  </div>
+                </div>
+                <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem', lineHeight: 1.7, marginBottom: 16 }}>{uc.description}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                  <div>
+                    <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Suggested Tools</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                      {uc.tools?.map((t, j) => (
+                        <span key={j} style={{ background: '#f0f7ff', color: 'var(--primary)', padding: '4px 10px', borderRadius: 50, fontSize: '0.8rem', fontWeight: 600 }}>{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>Estimated Impact</p>
+                    <p style={{ fontSize: '0.9rem', color: '#0a8754', fontWeight: 700 }}>📈 {uc.estimatedImpact}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* ROADMAP TAB */}
         {activeTab === 'roadmap' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div className="card">
-              <h2 style={{ fontSize: '1.3rem', marginBottom: 8 }}>{roadmap?.solutionIdeology?.title}</h2>
-              <p style={{ color: 'var(--text-mid)', lineHeight: 1.8, marginBottom: 20 }}>{roadmap?.solutionIdeology?.description}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-                {roadmap?.solutionIdeology?.principles?.map((p, i) => (
-                  <span key={i} className="tag tag-blue">{p}</span>
-                ))}
-              </div>
+            <div className="card" style={{ background: 'linear-gradient(135deg, #e0f5ed, #f0fdf7)', border: 'none' }}>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🗺️ Your AI Transformation Roadmap</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>A phased plan to build your AI capabilities over 12 months.</p>
             </div>
             {roadmap?.roadmap?.map((phase, i) => (
               <div key={i} className="card" style={{ borderLeft: `4px solid ${['#e8630a', '#0f4c81', '#0a8754'][i]}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: ['#fff0e6', '#e0ecff', '#e0f5ed'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: ['#e8630a', '#0f4c81', '#0a8754'][i], fontSize: '0.9rem' }}>{i + 1}</div>
+                  <div style={{ width: 36, height: 36, borderRadius: '50%', background: ['#fff0e6', '#e0ecff', '#e0f5ed'][i], display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: ['#e8630a', '#0f4c81', '#0a8754'][i] }}>{i + 1}</div>
                   <div>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-light)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{phase.phase} · {phase.duration}</p>
                     <h3 style={{ fontSize: '1.1rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700 }}>{phase.title}</h3>
@@ -168,32 +283,12 @@ export default function Results() {
           </div>
         )}
 
-        {/* METHODOLOGY TAB */}
-        {activeTab === 'methodology' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div className="card">
-              <span className="tag tag-blue" style={{ marginBottom: 16 }}>Recommended Approach</span>
-              <h2 style={{ fontSize: '1.4rem', marginBottom: 12 }}>{roadmap?.methodology?.name}</h2>
-              <p style={{ color: 'var(--text-mid)', lineHeight: 1.8, marginBottom: 24 }}>{roadmap?.methodology?.description}</p>
-              <h3 style={{ fontSize: '1rem', fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 700, marginBottom: 16 }}>Implementation Steps</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                {roadmap?.methodology?.steps?.map((step, i) => (
-                  <div key={i} style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 700, flexShrink: 0 }}>{i + 1}</div>
-                    <p style={{ color: 'var(--text-dark)', fontSize: '0.95rem', lineHeight: 1.7, paddingTop: 4 }}>{step}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* TRAINING TAB */}
         {activeTab === 'training' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="card" style={{ background: 'linear-gradient(135deg, #e0ecff, #f0f7ff)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Workforce Training Plan</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Upskilling recommendations tailored to your team and digital maturity level.</p>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🎓 AI Workforce Development Plan</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Upskilling roadmap to build your team's AI capabilities across all levels.</p>
             </div>
             {roadmap?.trainingPlan?.map((plan, i) => (
               <div key={i} className="card">
@@ -203,7 +298,7 @@ export default function Results() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
                   <div>
-                    <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Skills to Develop</p>
+                    <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>AI Skills to Develop</p>
                     <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
                       {plan.skills?.map((s, j) => <li key={j} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{s}</li>)}
                     </ul>
@@ -224,8 +319,8 @@ export default function Results() {
         {activeTab === 'compliance' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div className="card" style={{ background: 'linear-gradient(135deg, #fdf2f8, #fce7f3)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🛡️ Compliance & Governance</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Singapore-specific compliance requirements covering PDPA, Cybersecurity, and AI Governance frameworks.</p>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>🛡️ AI Compliance & Governance</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Singapore-specific compliance requirements for responsible AI adoption — covering PDPA, Cybersecurity and AI Governance frameworks.</p>
             </div>
 
             {/* PDPA */}
@@ -242,26 +337,19 @@ export default function Results() {
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Key Obligations</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.pdpa?.obligations?.map((o, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{o}</li>
-                    ))}
+                    {roadmap?.compliance?.pdpa?.obligations?.map((o, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{o}</li>)}
                   </ul>
                 </div>
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Recommended Actions</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.pdpa?.actions?.map((a, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>
-                    ))}
+                    {roadmap?.compliance?.pdpa?.actions?.map((a, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>)}
                   </ul>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {roadmap?.compliance?.pdpa?.resources?.map((r, i) => (
-                  <a key={i} href={r.url} target="_blank" rel="noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f3eeff', color: '#7c3aed', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>
-                    {r.name} →
-                  </a>
+                  <a key={i} href={r.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f3eeff', color: '#7c3aed', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>{r.name} →</a>
                 ))}
               </div>
             </div>
@@ -280,26 +368,19 @@ export default function Results() {
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Key Risks</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.cybersecurity?.risks?.map((r, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{r}</li>
-                    ))}
+                    {roadmap?.compliance?.cybersecurity?.risks?.map((r, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{r}</li>)}
                   </ul>
                 </div>
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Recommended Actions</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.cybersecurity?.actions?.map((a, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>
-                    ))}
+                    {roadmap?.compliance?.cybersecurity?.actions?.map((a, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>)}
                   </ul>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {roadmap?.compliance?.cybersecurity?.resources?.map((r, i) => (
-                  <a key={i} href={r.url} target="_blank" rel="noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef2f2', color: '#dc2626', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>
-                    {r.name} →
-                  </a>
+                  <a key={i} href={r.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#fef2f2', color: '#dc2626', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>{r.name} →</a>
                 ))}
               </div>
             </div>
@@ -318,26 +399,19 @@ export default function Results() {
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Core Principles</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.aiGovernance?.principles?.map((p, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{p}</li>
-                    ))}
+                    {roadmap?.compliance?.aiGovernance?.principles?.map((p, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{p}</li>)}
                   </ul>
                 </div>
                 <div>
                   <p style={{ fontSize: '0.78rem', fontWeight: 700, color: 'var(--text-light)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Recommended Actions</p>
                   <ul style={{ paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {roadmap?.compliance?.aiGovernance?.actions?.map((a, i) => (
-                      <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>
-                    ))}
+                    {roadmap?.compliance?.aiGovernance?.actions?.map((a, i) => <li key={i} style={{ fontSize: '0.9rem', color: 'var(--text-dark)' }}>{a}</li>)}
                   </ul>
                 </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
                 {roadmap?.compliance?.aiGovernance?.resources?.map((r, i) => (
-                  <a key={i} href={r.url} target="_blank" rel="noreferrer"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#e0ecff', color: '#0f4c81', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>
-                    {r.name} →
-                  </a>
+                  <a key={i} href={r.url} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#e0ecff', color: '#0f4c81', padding: '6px 14px', borderRadius: 50, fontSize: '0.82rem', fontWeight: 600, textDecoration: 'none' }}>{r.name} →</a>
                 ))}
               </div>
             </div>
@@ -348,8 +422,8 @@ export default function Results() {
         {activeTab === 'grants' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
             <div className="card" style={{ background: 'linear-gradient(135deg, #e0f5ed, #f0fdf7)', border: 'none' }}>
-              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>Matched Singapore Grants</h2>
-              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Government funding opportunities relevant to your transformation plan.</p>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: 8 }}>💰 Matched Singapore AI Grants</h2>
+              <p style={{ color: 'var(--text-mid)', fontSize: '0.92rem' }}>Government funding opportunities matched to your AI transformation plan.</p>
             </div>
             {roadmap?.grants?.map((grant, i) => (
               <div key={i} className="card">
@@ -370,9 +444,18 @@ export default function Results() {
 
         {/* Bottom CTA */}
         <div style={{ marginTop: 48, textAlign: 'center', padding: '40px 24px', background: 'white', borderRadius: 16, border: '1px solid var(--border)' }}>
-          <h3 style={{ fontSize: '1.3rem', marginBottom: 8 }}>Want to explore further?</h3>
-          <p style={{ color: 'var(--text-light)', marginBottom: 24, fontSize: '0.95rem' }}>Start a new assessment or refine your answers</p>
-          <button className="btn-primary" onClick={() => navigate('/form')}>Start New Assessment</button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 28, height: 28, background: '#e8630a', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: 'white', fontSize: '0.8rem' }}>AI</div>
+            <span style={{ fontWeight: 800, color: 'var(--primary)' }}>Singapore AI Association</span>
+          </div>
+          <h3 style={{ fontSize: '1.3rem', marginBottom: 8 }}>Want a deeper consultation?</h3>
+          <p style={{ color: 'var(--text-light)', marginBottom: 24, fontSize: '0.95rem' }}>Our team can provide a detailed AI readiness workshop tailored to your business.</p>
+          <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button className="btn-primary" onClick={() => navigate('/form')}>Start New Assessment</button>
+            <a href="mailto:info@saia.org.sg" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <button className="btn-secondary">Contact SAIA →</button>
+            </a>
+          </div>
         </div>
 
       </div>
