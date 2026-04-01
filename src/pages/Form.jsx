@@ -142,7 +142,7 @@ export default function Form() {
                 <label style={labelStyle}>Company Website (optional)</label>
                 <input style={inputStyle} placeholder="e.g. https://www.yourcompany.com.sg" value={form.websiteUrl} onChange={e => update('websiteUrl', e.target.value)} />
                 <p style={{ fontSize: '0.78rem', color: 'var(--text-light)', marginTop: 4 }}>
-                  💡 Providing your website helps us tailor the roadmap more accurately to your business
+                  💡 Providing your website helps us tailor the roadmap more accurately
                 </p>
               </div>
               <div>

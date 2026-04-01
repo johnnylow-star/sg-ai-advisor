@@ -1,6 +1,65 @@
 const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
 
+function getDataConfidenceScore(formData) {
+  let score = 0
+  if (formData.websiteUrl) score += 30
+  if (formData.currentTools) score += 15
+  if (formData.revenue) score += 10
+  if (formData.otherPainPoints) score += 10
+  if (formData.painPoints.length >= 3) score += 15
+  if (formData.techLevel > 1) score += 10
+  if (formData.employeeCount) score += 10
+  return score
+}
+
+async function analyseWebsite(url) {
+  if (!url) return null
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: [{
+          role: 'user',
+          content: `Search for and summarise this company website: ${url}. 
+          Return a brief summary covering: what the company does, their main products/services, 
+          their apparent target market, and any digital presence observations. 
+          Keep it under 200 words.`
+        }]
+      })
+    })
+    const data = await response.json()
+    const textBlock = data.content?.find(b => b.type === 'text')
+    return textBlock?.text || null
+  } catch (err) {
+    console.error('Website analysis failed:', err)
+    return null
+  }
+}
+
 export async function generateRoadmap(formData) {
+  const confidenceScore = getDataConfidenceScore(formData)
+  const isLowData = confidenceScore < 40
+  const websiteSummary = await analyseWebsite(formData.websiteUrl)
+
+  const disclaimerNote = isLowData
+    ? `IMPORTANT: Limited company-specific information was provided. Clearly note in the executiveSummary that this roadmap is based on Singapore industry best practices for ${formData.industry} companies of ${formData.employeeCount} employees, and recommend the company seek a detailed consultation for a more tailored plan.`
+    : ''
+
+  const websiteContext = websiteSummary
+    ? `WEBSITE ANALYSIS: ${websiteSummary}`
+    : formData.websiteUrl
+      ? 'Website was provided but could not be analysed. Base recommendations on the form data provided.'
+      : 'No website provided. Base recommendations on form data and industry best practices.'
+
   const prompt = `You are a Singapore digital transformation consultant. Based on the following company profile, generate a detailed transformation roadmap.
 
 COMPANY PROFILE:
@@ -8,15 +67,28 @@ COMPANY PROFILE:
 - Company: ${formData.companyName}
 - Industry: ${formData.industry}
 - Employees: ${formData.employeeCount}
-- Annual Revenue: ${formData.revenue}
-- Current Tools: ${formData.currentTools}
+- Annual Revenue: ${formData.revenue || 'Not provided'}
+- Current Tools: ${formData.currentTools || 'Not provided'}
 - Digital Maturity Level: ${formData.techLevel}/5
 - Pain Points: ${formData.painPoints.join(', ')}
-- Additional Challenges: ${formData.otherPainPoints}
+- Marketing Channels: ${formData.marketingChannels?.length ? formData.marketingChannels.join(', ') : 'N/A'}
+- Customer Experience Issues: ${formData.cxBreakdown?.length ? formData.cxBreakdown.join(', ') : 'N/A'}
+- Cybersecurity Concerns: ${formData.cyberConcerns?.length ? formData.cyberConcerns.join(', ') : 'N/A'}
+- Remote Work Issues: ${formData.remoteIssues?.length ? formData.remoteIssues.join(', ') : 'N/A'}
+- PDPA Concerns: ${formData.pdpaConcerns?.length ? formData.pdpaConcerns.join(', ') : 'N/A'}
+- Additional Challenges: ${formData.otherPainPoints || 'None'}
+
+${websiteContext}
+
+Data Confidence Score: ${confidenceScore}/100
+${disclaimerNote}
 
 Return ONLY a valid JSON object with exactly this structure, no markdown, no explanation:
 {
-  "executiveSummary": "2-3 sentence summary of the company situation and transformation opportunity",
+  "isLowDataPlan": ${isLowData},
+  "confidenceScore": ${confidenceScore},
+  "websiteInsights": "Brief note about what was learned from website analysis, or null if no website",
+  "executiveSummary": "2-3 sentence summary. If low data, mention this is based on industry best practices.",
   "solutionIdeology": {
     "title": "e.g. Cloud-First, AI-Augmented Operations",
     "description": "2-3 sentences explaining the core philosophy",
@@ -70,6 +142,26 @@ Return ONLY a valid JSON object with exactly this structure, no markdown, no exp
       "provider": "e.g. AWS, Google, Microsoft"
     }
   ],
+  "compliance": {
+    "pdpa": {
+      "overview": "Brief PDPA situation assessment for this company",
+      "obligations": ["obligation 1", "obligation 2", "obligation 3"],
+      "actions": ["action 1", "action 2", "action 3"],
+      "resources": [{"name": "resource name", "url": "https://..."}]
+    },
+    "cybersecurity": {
+      "overview": "Brief cybersecurity posture assessment",
+      "risks": ["risk 1", "risk 2", "risk 3"],
+      "actions": ["action 1", "action 2", "action 3"],
+      "resources": [{"name": "resource name", "url": "https://..."}]
+    },
+    "aiGovernance": {
+      "overview": "Brief AI governance assessment relevant to their transformation",
+      "principles": ["principle 1", "principle 2", "principle 3"],
+      "actions": ["action 1", "action 2", "action 3"],
+      "resources": [{"name": "resource name", "url": "https://..."}]
+    }
+  },
   "grants": [
     {
       "name": "Productivity Solutions Grant (PSG)",
@@ -93,8 +185,7 @@ Return ONLY a valid JSON object with exactly this structure, no markdown, no exp
       "url": "https://www.skillsfuture.gov.sg/sfec"
     }
   ]
-}
-`
+}`
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -105,7 +196,7 @@ Return ONLY a valid JSON object with exactly this structure, no markdown, no exp
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-model: 'claude-opus-4-5',
+      model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }]
     })
